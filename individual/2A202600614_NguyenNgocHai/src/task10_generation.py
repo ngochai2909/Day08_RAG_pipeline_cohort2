@@ -84,6 +84,7 @@ def reorder_for_llm(chunks: list[dict]) -> list[dict]:
     if len(chunks) <= 2:
         return chunks
 
+    # Place highly ranked chunks at beginning and end.
     front = [chunks[i] for i in range(0, len(chunks), 2)]
     back = [chunks[i] for i in range(1, len(chunks), 2)]
     back.reverse()
@@ -147,6 +148,7 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
     if not query.strip():
         return {"answer": "Tôi không thể xác minh thông tin này từ nguồn hiện có.", "sources": [], "retrieval_source": "none"}
 
+    # Step 1: Retrieve
     chunks = retrieve(query, top_k=top_k)
     if not chunks:
         return {
@@ -155,10 +157,16 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
             "retrieval_source": "none",
         }
 
+    # Step 2: Reorder
     reordered = reorder_for_llm(chunks)
+
+    # Step 3: Format context
     context = format_context(reordered)
+
+    # Step 4: Build prompt
     user_message = f"Context:\n{context}\n\n---\n\nQuestion: {query}"
 
+    # Step 5: Call LLM (with robust fallback)
     answer = ""
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if api_key:
@@ -179,6 +187,7 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
         except Exception:
             answer = ""
 
+    # Offline/connection fallback answer with citations from top contexts.
     if not answer:
         citations = []
         for chunk in reordered[: min(2, len(reordered))]:
@@ -190,6 +199,7 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
             f"Bạn có thể tham khảo các ngữ cảnh liên quan đã truy xuất {citation_text}".strip()
         )
 
+    # Step 6: Return
     return {
         "answer": answer,
         "sources": reordered,

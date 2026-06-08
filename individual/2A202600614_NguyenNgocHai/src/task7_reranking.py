@@ -88,8 +88,10 @@ def rerank_cross_encoder(
             if outputs:
                 return outputs[:top_k]
         except Exception:
+            # Fall back to local heuristic when API is unavailable.
             pass
 
+    # Local fallback: combine lexical overlap with existing retrieval score.
     reranked = []
     for candidate in candidates:
         base_score = float(candidate.get("score", 0.0))
@@ -233,8 +235,10 @@ def rerank(
     if method == "cross_encoder":
         return rerank_cross_encoder(query, candidates, top_k)
     if method == "mmr":
+        # Without query embedding at this layer, MMR falls back to candidate scores.
         return rerank_mmr(query_embedding=[], candidates=candidates, top_k=top_k)
     if method == "rrf":
+        # Single-list RRF fallback to keep interface simple.
         return rerank_rrf([candidates], top_k=top_k)
     raise ValueError(f"Unknown rerank method: {method}")
 

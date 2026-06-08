@@ -1,17 +1,82 @@
 [
   {
-    "question": "Hình phạt cho tội tàng trữ trái phép chất ma tuý theo Điều 249 Bộ luật Hình sự?",
-    "expected_answer": "Phạt tù từ 1 đến 5 năm đối với trường hợp tàng trữ từ 1g đến dưới 5g heroin hoặc cocaine, hoặc chất ma tuý khác với khối lượng tương đương.",
-    "expected_context": "Bộ luật Hình sự 2015, Điều 249"
+    "question": "Theo Điều 28 Luật Phòng, chống ma túy 2021, có những biện pháp cai nghiện ma túy nào?",
+    "expected_answer": "Điều 28 quy định 2 biện pháp cai nghiện ma túy gồm: cai nghiện ma túy tự nguyện và cai nghiện ma túy bắt buộc.",
+    "expected_context": "data/standardized/legal/luat-ma-tuy-2021.md, Điều 28"
   },
   {
-    "question": "Luật Phòng chống ma tuý 2021 quy định những hình thức cai nghiện nào?",
-    "expected_answer": "Cai nghiện tự nguyện tại gia đình, cai nghiện tự nguyện tại cộng đồng, cai nghiện tự nguyện tại cơ sở cai nghiện, và cai nghiện bắt buộc tại cơ sở cai nghiện.",
-    "expected_context": "Luật Phòng chống ma tuý 2021, Chương V"
+    "question": "Theo Luật Phòng, chống ma túy 2021, cai nghiện tự nguyện và bắt buộc được thực hiện ở đâu?",
+    "expected_answer": "Cai nghiện tự nguyện được thực hiện tại gia đình, cộng đồng hoặc tại cơ sở cai nghiện ma túy; cai nghiện bắt buộc được thực hiện tại cơ sở cai nghiện ma túy công lập.",
+    "expected_context": "data/standardized/legal/luat-ma-tuy-2021.md, Điều 28 khoản 2"
   },
   {
-    "question": "Danh mục các chất ma tuý thuộc nhóm I theo quy định pháp luật Việt Nam gồm những chất nào?",
-    "expected_answer": "Nhóm I gồm các chất ma tuý tuyệt đối cấm sử dụng trong y học và đời sống, bao gồm heroin, cocaine, methamphetamine, MDMA (ecstasy), cannabis (cần sa), và các chất tương tự.",
-    "expected_context": "Nghị định 57/2022/NĐ-CP, Phụ lục I"
+    "question": "Quy trình cai nghiện ma túy theo Điều 29 gồm những giai đoạn nào?",
+    "expected_answer": "Quy trình gồm 5 giai đoạn: tiếp nhận phân loại; điều trị cắt cơn/giải độc và điều trị bệnh; giáo dục tư vấn phục hồi hành vi nhân cách; lao động trị liệu học nghề; chuẩn bị tái hòa nhập cộng đồng.",
+    "expected_context": "data/standardized/legal/luat-ma-tuy-2021.md, Điều 29 khoản 1"
+  },
+  {
+    "question": "Điều 29 quy định sự khác nhau nào giữa cai nghiện bắt buộc và cai nghiện tự nguyện về số giai đoạn phải hoàn thành?",
+    "expected_answer": "Cai nghiện bắt buộc phải bảo đảm đầy đủ các giai đoạn theo khoản 1 Điều 29, còn cai nghiện tự nguyện phải hoàn thành đủ 3 giai đoạn tại các điểm a, b, c khoản 1 Điều 29.",
+    "expected_context": "data/standardized/legal/luat-ma-tuy-2021.md, Điều 29 khoản 2"
+  },
+  {
+    "question": "Thời hạn cai nghiện ma túy tự nguyện tại gia đình, cộng đồng là bao lâu?",
+    "expected_answer": "Thời hạn cai nghiện ma túy tự nguyện tại gia đình, cộng đồng là từ đủ 06 tháng đến 12 tháng.",
+    "expected_context": "data/standardized/legal/luat-ma-tuy-2021.md, Điều 30 khoản 2"
+  },
+  {
+    "question": "Thời hạn cai nghiện ma túy bắt buộc đối với người từ đủ 12 tuổi đến dưới 18 tuổi là bao lâu?",
+    "expected_answer": "Thời hạn cai nghiện ma túy bắt buộc đối với người từ đủ 12 tuổi đến dưới 18 tuổi là từ đủ 06 tháng đến 12 tháng.",
+    "expected_context": "data/standardized/legal/luat-ma-tuy-2021.md, Điều 34 khoản 3"
+  },
+  {
+    "question": "Người hoàn thành cai nghiện tự nguyện hoặc hoàn thành điều trị nghiện bằng thuốc thay thế phải chịu quản lý sau cai trong bao lâu?",
+    "expected_answer": "Theo Điều 40, các trường hợp này chịu sự quản lý sau cai nghiện ma túy trong thời hạn 01 năm kể từ ngày hoàn thành.",
+    "expected_context": "data/standardized/legal/luat-ma-tuy-2021.md, Điều 40 khoản 1"
+  },
+  {
+    "question": "Người đã chấp hành xong quyết định đưa vào cơ sở cai nghiện bắt buộc phải chịu quản lý sau cai bao lâu?",
+    "expected_answer": "Theo Điều 40 khoản 2, thời hạn quản lý sau cai nghiện ma túy là 02 năm kể từ ngày chấp hành xong quyết định.",
+    "expected_context": "data/standardized/legal/luat-ma-tuy-2021.md, Điều 40 khoản 2"
+  },
+  {
+    "question": "Nghị định quy định các danh mục chất ma túy và tiền chất trong dữ liệu có số hiệu gì và ngày ban hành nào?",
+    "expected_answer": "Nghị định có số 28/2026/NĐ-CP, ban hành ngày 19 tháng 01 năm 2026.",
+    "expected_context": "data/standardized/legal/quy_dinh_tien_chat.md, phần đầu văn bản"
+  },
+  {
+    "question": "Nghị định 28/2026/NĐ-CP có hiệu lực thi hành từ ngày nào?",
+    "expected_answer": "Nghị định này có hiệu lực thi hành từ ngày 19 tháng 01 năm 2026.",
+    "expected_context": "data/standardized/legal/quy_dinh_tien_chat.md, Điều 3 khoản 1"
+  },
+  {
+    "question": "Theo Điều 1 Nghị định 28/2026/NĐ-CP, Danh mục I được mô tả như thế nào?",
+    "expected_answer": "Danh mục I là các chất ma túy tuyệt đối cấm sử dụng trong y học và đời sống xã hội; chỉ được sử dụng trong nghiên cứu/kiểm nghiệm/giám định hoặc mục đích quốc phòng, an ninh theo quy định đặc biệt.",
+    "expected_context": "data/standardized/legal/quy_dinh_tien_chat.md, Điều 1"
+  },
+  {
+    "question": "Theo Nghị định 28/2026/NĐ-CP, Danh mục IV về tiền chất gồm các nhóm nào?",
+    "expected_answer": "Danh mục IV gồm IVA, IVB và IVC: tiền chất thiết yếu không có ứng dụng hợp pháp; tiền chất thiết yếu có ứng dụng hợp pháp; và tiền chất là hóa chất/dung môi/chất xúc tác dùng trong sản xuất chất ma túy.",
+    "expected_context": "data/standardized/legal/quy_dinh_tien_chat.md, Điều 1 mục Danh mục IV"
+  },
+  {
+    "question": "Theo bài article_02, ca sĩ Miu Lê tên thật là gì và bị bắt với cáo buộc gì?",
+    "expected_answer": "Bài viết nêu ca sĩ Miu Lê tên thật là Lê Ánh Nhật và bị bắt tạm giam về hành vi tổ chức sử dụng trái phép chất ma túy.",
+    "expected_context": "data/standardized/news/article_02.md"
+  },
+  {
+    "question": "Theo article_02, thời điểm nào Cơ quan CSĐT Công an Hải Phòng ra quyết định khởi tố và bắt tạm giam đối với Miu Lê?",
+    "expected_answer": "Theo bài viết, ngày 16/5 Cơ quan CSĐT Công an thành phố Hải Phòng đã ra quyết định khởi tố và lệnh bắt tạm giam đối với Lê Ánh Nhật (Miu Lê).",
+    "expected_context": "data/standardized/news/article_02.md"
+  },
+  {
+    "question": "Theo article_06, Chu Bin có tên thật là gì và cơ quan nào tạm giữ để điều tra?",
+    "expected_answer": "Bài viết nêu Chu Bin tên thật là Chu Đăng Thanh, bị Công an Quận 10 (TP Hồ Chí Minh) tạm giữ để điều tra hành vi tổ chức, sử dụng trái phép chất ma túy.",
+    "expected_context": "data/standardized/news/article_06.md"
+  },
+  {
+    "question": "Theo article_04, Nguyễn Công Trí bao nhiêu tuổi và bị bắt trong bối cảnh nào?",
+    "expected_answer": "Bài viết nêu Nguyễn Công Trí 47 tuổi, bị bắt quả tang sử dụng ma túy tại nhà riêng khi cảnh sát điều tra đường dây mua bán chất cấm.",
+    "expected_context": "data/standardized/news/article_04.md"
   }
 ]

@@ -1,0 +1,45 @@
+# Python environments
+venv/
+.venv/
+env/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python cache / build artifacts
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+dist/
+build/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local runtime data artifacts (regenerable)
+data/chroma_db/
+data/vector_index_snapshot.json
+data/pageindex_doc_registry.json
+individual/*/data/chroma_db/
+individual/*/data/vector_index_snapshot.json
+individual/*/data/pageindex_doc_registry.json

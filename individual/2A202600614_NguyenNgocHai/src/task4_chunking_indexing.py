@@ -51,6 +51,7 @@ CHUNK_OVERLAP = 50      # Vì sao chọn 50? ...
 CHUNKING_METHOD = "recursive"  # "recursive" | "markdown_header" | "semantic"
 
 # TODO: Chọn embedding model và giải thích
+# Dùng OpenAI text-embedding-3-small vì ổn định, nhanh và dễ tích hợp khi đã có API key.
 EMBEDDING_MODEL = "text-embedding-3-small"
 EMBEDDING_DIM = 1536
 
@@ -244,6 +245,7 @@ def index_to_vectorstore(chunks: list[dict]):
         except Exception as exc:
             print(f"⚠ Weaviate unavailable ({exc}). Saving local snapshot instead.")
 
+    # Generic fallback snapshot keeps progress when selected DB is unavailable.
     import json
 
     LOCAL_INDEX_SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
