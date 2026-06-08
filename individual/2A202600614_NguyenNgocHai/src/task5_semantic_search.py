@@ -49,10 +49,12 @@ def semantic_search(query: str, top_k: int = 10) -> list[dict]:
     if not CHROMA_DB_DIR.exists():
         return []
 
+    # Step 1: Embed query with the same model used in Task 4.
     client = OpenAI(api_key=api_key)
     embedding_response = client.embeddings.create(model=EMBEDDING_MODEL, input=query)
     query_embedding = embedding_response.data[0].embedding
 
+    # Step 2: Query ChromaDB by vector similarity.
     import chromadb
 
     chroma_client = chromadb.PersistentClient(path=str(CHROMA_DB_DIR))
@@ -71,6 +73,7 @@ def semantic_search(query: str, top_k: int = 10) -> list[dict]:
     metadatas = result.get("metadatas", [[]])[0]
     distances = result.get("distances", [[]])[0]
 
+    # Step 3: Normalize output format and sort descending by score.
     outputs: list[dict] = []
     for doc, metadata, distance in zip(documents, metadatas, distances):
         similarity = 1.0 - float(distance)

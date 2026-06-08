@@ -48,7 +48,7 @@ def _save_registry(registry: dict) -> None:
 
 def upload_documents():
     """
-    Upload toàn bộ markdown documents lên PageIndex.
+    Upload legal PDF documents lên PageIndex.
     """
     if not PAGEINDEX_API_KEY:
         print("⚠ PAGEINDEX_API_KEY chưa được cấu hình, bỏ qua upload.")
@@ -172,6 +172,7 @@ def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
         except Exception as exc:
             print(f"⚠ PageIndex query lỗi ({exc}), dùng fallback local.")
 
+    # Fallback local when PageIndex key/SDK is unavailable.
     try:
         from .task5_semantic_search import semantic_search
         fallback = semantic_search(query, top_k=top_k)
@@ -182,6 +183,7 @@ def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
     except Exception:
         pass
 
+    # Final offline-safe fallback: lexical search.
     try:
         from .task6_lexical_search import lexical_search
 

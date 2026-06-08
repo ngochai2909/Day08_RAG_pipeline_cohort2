@@ -19,8 +19,9 @@ from pathlib import Path
 
 from markitdown import MarkItDown
 
-LANDING_DIR = Path(__file__).parent.parent / "data" / "landing"
-OUTPUT_DIR = Path(__file__).parent.parent / "data" / "standardized"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+LANDING_DIR = PROJECT_ROOT / "data" / "landing"
+OUTPUT_DIR = PROJECT_ROOT / "data" / "standardized"
 
 
 

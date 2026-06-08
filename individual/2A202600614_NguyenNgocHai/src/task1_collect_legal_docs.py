@@ -20,7 +20,8 @@ Gợi ý văn bản:
 
 from pathlib import Path
 
-DATA_DIR = Path(__file__).parent.parent / "data" / "landing" / "legal"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = PROJECT_ROOT / "data" / "landing" / "legal"
 
 
 def setup_directory():

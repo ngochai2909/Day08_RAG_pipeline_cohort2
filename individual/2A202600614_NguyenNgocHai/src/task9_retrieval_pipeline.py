@@ -70,6 +70,7 @@ def retrieve(
     if not query.strip() or top_k <= 0:
         return []
 
+    # Step 1: Run semantic + lexical retrieval.
     try:
         dense_results = semantic_search(query, top_k=top_k * 2)
     except Exception:
@@ -79,11 +80,13 @@ def retrieve(
     except Exception:
         sparse_results = []
 
+    # Step 2: Merge with RRF.
     merged = rerank_rrf([dense_results, sparse_results], top_k=top_k * 3)
     for item in merged:
         item["source"] = "hybrid"
         item.setdefault("metadata", {})
 
+    # Step 3: Optional reranking.
     if use_reranking and merged:
         final_results = rerank(query, merged, top_k=top_k, method=RERANK_METHOD)
     else:
@@ -91,6 +94,7 @@ def retrieve(
 
     final_results = sorted(final_results, key=lambda x: float(x.get("score", 0.0)), reverse=True)
 
+    # Step 4: fallback to PageIndex when hybrid confidence is low.
     best_score = float(final_results[0]["score"]) if final_results else 0.0
     if not final_results or best_score < score_threshold:
         print(
@@ -102,8 +106,10 @@ def retrieve(
             if fallback:
                 return fallback[:top_k]
         except Exception:
+            # Keep returning hybrid results if PageIndex branch fails.
             pass
 
+    # Step 5: keep output schema stable.
     normalized = []
     for item in final_results[:top_k]:
         normalized.append(
