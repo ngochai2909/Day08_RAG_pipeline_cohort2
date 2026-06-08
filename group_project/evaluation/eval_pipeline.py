@@ -29,130 +29,130 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 # Step 2 — RAG interface adapter for evaluation
 # =============================================================================
 
-# # Two baseline configs for A/B evaluation.
-# CONFIG_A = {
-#     "name": "hybrid_rerank",
-#     "top_k": 5,
-#     "score_threshold": 0.3,
-#     "use_reranking": True,
-# }
+# Two baseline configs for A/B evaluation.
+CONFIG_A = {
+    "name": "hybrid_rerank",
+    "top_k": 5,
+    "score_threshold": 0.3,
+    "use_reranking": True,
+}
 
-# CONFIG_B = {
-#     "name": "dense_only",
-#     "top_k": 5,
-#     "score_threshold": 0.3,
-#     "use_reranking": False,
-# }
-
-
-# def get_ab_configs() -> dict[str, dict]:
-#     """Return standardized A/B configs used by evaluation pipeline."""
-#     return {
-#         "config_a": CONFIG_A.copy(),
-#         "config_b": CONFIG_B.copy(),
-#     }
+CONFIG_B = {
+    "name": "dense_only",
+    "top_k": 5,
+    "score_threshold": 0.3,
+    "use_reranking": False,
+}
 
 
-# def _normalize_sources(raw_sources: Any) -> list[dict]:
-#     """
-#     Normalize retrieval sources to a unified schema:
-#     {'content': str, 'metadata': dict}
-#     """
-#     if not isinstance(raw_sources, list):
-#         return []
-
-#     normalized: list[dict] = []
-#     for item in raw_sources:
-#         if isinstance(item, dict):
-#             content = item.get("content", "")
-#             metadata = item.get("metadata", {})
-#             if not isinstance(metadata, dict):
-#                 metadata = {"raw_metadata": metadata}
-#             normalized.append({"content": str(content), "metadata": metadata})
-#         else:
-#             normalized.append({"content": str(item), "metadata": {}})
-#     return normalized
+def get_ab_configs() -> dict[str, dict]:
+    """Return standardized A/B configs used by evaluation pipeline."""
+    return {
+        "config_a": CONFIG_A.copy(),
+        "config_b": CONFIG_B.copy(),
+    }
 
 
-# def normalize_rag_output(raw_output: Any, query: str, config: dict) -> dict:
-#     """
-#     Normalize different RAG output formats into a single contract:
-#     {
-#         'answer': str,
-#         'sources': list[dict],  # each has content + metadata
-#         'retrieval_source': str
-#     }
-#     """
-#     retrieval_source = str(config.get("name", "unknown"))
+def _normalize_sources(raw_sources: Any) -> list[dict]:
+    """
+    Normalize retrieval sources to a unified schema:
+    {'content': str, 'metadata': dict}
+    """
+    if not isinstance(raw_sources, list):
+        return []
 
-#     if isinstance(raw_output, dict):
-#         return {
-#             "answer": str(raw_output.get("answer", "")),
-#             "sources": _normalize_sources(raw_output.get("sources", [])),
-#             "retrieval_source": str(raw_output.get("retrieval_source", retrieval_source)),
-#         }
-
-#     # Fallback for string-only generators
-#     if isinstance(raw_output, str):
-#         return {
-#             "answer": raw_output,
-#             "sources": [],
-#             "retrieval_source": retrieval_source,
-#         }
-
-#     # Conservative fallback to avoid crashing the eval loop.
-#     return {
-#         "answer": "",
-#         "sources": [],
-#         "retrieval_source": retrieval_source,
-#     }
+    normalized: list[dict] = []
+    for item in raw_sources:
+        if isinstance(item, dict):
+            content = item.get("content", "")
+            metadata = item.get("metadata", {})
+            if not isinstance(metadata, dict):
+                metadata = {"raw_metadata": metadata}
+            normalized.append({"content": str(content), "metadata": metadata})
+        else:
+            normalized.append({"content": str(item), "metadata": {}})
+    return normalized
 
 
-# def run_rag(question: str, rag_pipeline: Any, config: dict) -> dict:
-#     """
-#     Unified adapter used by evaluation scripts.
+def normalize_rag_output(raw_output: Any, query: str, config: dict) -> dict:
+    """
+    Normalize different RAG output formats into a single contract:
+    {
+        'answer': str,
+        'sources': list[dict],  # each has content + metadata
+        'retrieval_source': str
+    }
+    """
+    retrieval_source = str(config.get("name", "unknown"))
 
-#     Supported rag_pipeline forms:
-#     1) Callable: rag_pipeline(question, config=config) or rag_pipeline(question, **config)
-#     2) Object with generate_with_citation(question, ...)
-#     """
-#     if rag_pipeline is None:
-#         raise ValueError("rag_pipeline is required")
+    if isinstance(raw_output, dict):
+        return {
+            "answer": str(raw_output.get("answer", "")),
+            "sources": _normalize_sources(raw_output.get("sources", [])),
+            "retrieval_source": str(raw_output.get("retrieval_source", retrieval_source)),
+        }
 
-#     raw_output = None
+    # Fallback for string-only generators
+    if isinstance(raw_output, str):
+        return {
+            "answer": raw_output,
+            "sources": [],
+            "retrieval_source": retrieval_source,
+        }
 
-#     # Case 1: function-style pipeline
-#     if callable(rag_pipeline):
-#         try:
-#             raw_output = rag_pipeline(question, config=config)
-#         except TypeError:
-#             try:
-#                 raw_output = rag_pipeline(question, **config)
-#             except TypeError:
-#                 raw_output = rag_pipeline(question)
-#     # Case 2: object-style pipeline
-#     elif hasattr(rag_pipeline, "generate_with_citation"):
-#         generator = rag_pipeline.generate_with_citation
-#         try:
-#             raw_output = generator(question, config=config)
-#         except TypeError:
-#             try:
-#                 raw_output = generator(question, top_k=config.get("top_k", 5))
-#             except TypeError:
-#                 raw_output = generator(question)
-#     else:
-#         raise TypeError(
-#             "rag_pipeline must be callable or expose generate_with_citation(question, ...)"
-#         )
+    # Conservative fallback to avoid crashing the eval loop.
+    return {
+        "answer": "",
+        "sources": [],
+        "retrieval_source": retrieval_source,
+    }
 
-#     normalized = normalize_rag_output(raw_output, question, config)
-#     if "answer" not in normalized:
-#         normalized["answer"] = ""
-#     if "sources" not in normalized:
-#         normalized["sources"] = []
-#     if "retrieval_source" not in normalized:
-#         normalized["retrieval_source"] = str(config.get("name", "unknown"))
-#     return normalized
+
+def run_rag(question: str, rag_pipeline: Any, config: dict) -> dict:
+    """
+    Unified adapter used by evaluation scripts.
+
+    Supported rag_pipeline forms:
+    1) Callable: rag_pipeline(question, config=config) or rag_pipeline(question, **config)
+    2) Object with generate_with_citation(question, ...)
+    """
+    if rag_pipeline is None:
+        raise ValueError("rag_pipeline is required")
+
+    raw_output = None
+
+    # Case 1: function-style pipeline
+    if callable(rag_pipeline):
+        try:
+            raw_output = rag_pipeline(question, config=config)
+        except TypeError:
+            try:
+                raw_output = rag_pipeline(question, **config)
+            except TypeError:
+                raw_output = rag_pipeline(question)
+    # Case 2: object-style pipeline
+    elif hasattr(rag_pipeline, "generate_with_citation"):
+        generator = rag_pipeline.generate_with_citation
+        try:
+            raw_output = generator(question, config=config)
+        except TypeError:
+            try:
+                raw_output = generator(question, top_k=config.get("top_k", 5))
+            except TypeError:
+                raw_output = generator(question)
+    else:
+        raise TypeError(
+            "rag_pipeline must be callable or expose generate_with_citation(question, ...)"
+        )
+
+    normalized = normalize_rag_output(raw_output, question, config)
+    if "answer" not in normalized:
+        normalized["answer"] = ""
+    if "sources" not in normalized:
+        normalized["sources"] = []
+    if "retrieval_source" not in normalized:
+        normalized["retrieval_source"] = str(config.get("name", "unknown"))
+    return normalized
 
 
 def load_golden_dataset() -> list[dict]:
@@ -173,35 +173,35 @@ def evaluate_with_deepeval(rag_pipeline, golden_dataset: list[dict]) -> dict:
     """
     # TODO: Implement
     #
-    # from deepeval import evaluate
-    # from deepeval.metrics import (
-    #     FaithfulnessMetric,
-    #     AnswerRelevancyMetric,
-    #     ContextualRecallMetric,
-    #     ContextualPrecisionMetric,
-    # )
-    # from deepeval.test_case import LLMTestCase
-    #
-    # test_cases = []
-    # for item in golden_dataset:
-    #     result = rag_pipeline.generate_with_citation(item["question"])
-    #     test_case = LLMTestCase(
-    #         input=item["question"],
-    #         actual_output=result["answer"],
-    #         expected_output=item["expected_answer"],
-    #         retrieval_context=[c["content"] for c in result["sources"]],
-    #     )
-    #     test_cases.append(test_case)
-    #
-    # metrics = [
-    #     FaithfulnessMetric(threshold=0.7),
-    #     AnswerRelevancyMetric(threshold=0.7),
-    #     ContextualRecallMetric(threshold=0.7),
-    #     ContextualPrecisionMetric(threshold=0.7),
-    # ]
-    #
-    # results = evaluate(test_cases, metrics)
-    # return results
+     from deepeval import evaluate
+     from deepeval.metrics import (
+         FaithfulnessMetric,
+         AnswerRelevancyMetric,
+         ContextualRecallMetric,
+         ContextualPrecisionMetric,
+     )
+     from deepeval.test_case import LLMTestCase
+    
+     test_cases = []
+     for item in golden_dataset:
+         result = rag_pipeline.generate_with_citation(item["question"])
+         test_case = LLMTestCase(
+             input=item["question"],
+         actual_output=result["answer"],
+             expected_output=item["expected_answer"],
+             retrieval_context=[c["content"] for c in result["sources"]],
+         )
+         test_cases.append(test_case)
+    
+     metrics = [
+         FaithfulnessMetric(threshold=0.7),
+         AnswerRelevancyMetric(threshold=0.7),
+         ContextualRecallMetric(threshold=0.7),
+         ContextualPrecisionMetric(threshold=0.7),
+     ]
+    
+     results = evaluate(test_cases, metrics)
+     return results
     raise NotImplementedError("Implement evaluate_with_deepeval")
 
 
@@ -310,27 +310,27 @@ def evaluate_with_trulens(rag_pipeline, golden_dataset: list[dict]) -> dict:
     """
     # TODO: Implement
     #
-    # from trulens.apps.custom import TruCustomApp
-    # from trulens.core import Feedback
-    # from trulens.providers.openai import OpenAI as TruOpenAI
-    #
-    # provider = TruOpenAI()
-    #
-    # f_faithfulness = Feedback(provider.groundedness_measure_with_cot_reasons).on_output()
-    # f_relevance = Feedback(provider.relevance).on_input_output()
-    # f_context_relevance = Feedback(provider.context_relevance).on_input()
-    #
-    # tru_rag = TruCustomApp(
-    #     rag_pipeline,
-    #     app_name="DrugLaw_RAG",
-    #     feedbacks=[f_faithfulness, f_relevance, f_context_relevance],
-    # )
-    #
-    # with tru_rag as recording:
-    #     for item in golden_dataset:
-    #         rag_pipeline.generate_with_citation(item["question"])
-    #
-    # # Dashboard: from trulens.dashboard import run_dashboard; run_dashboard()
+    from trulens.apps.custom import TruCustomApp
+     from trulens.core import Feedback
+     from trulens.providers.openai import OpenAI as TruOpenAI
+    
+     provider = TruOpenAI()
+    
+     f_faithfulness = Feedback(provider.groundedness_measure_with_cot_reasons).on_output()
+     f_relevance = Feedback(provider.relevance).on_input_output()
+     f_context_relevance = Feedback(provider.context_relevance).on_input()
+    
+     tru_rag = TruCustomApp(
+         rag_pipeline,
+         app_name="DrugLaw_RAG",
+         feedbacks=[f_faithfulness, f_relevance, f_context_relevance],
+     )
+    
+     with tru_rag as recording:
+         for item in golden_dataset:
+             rag_pipeline.generate_with_citation(item["question"])
+    
+    # Dashboard: from trulens.dashboard import run_dashboard; run_dashboard()
     raise NotImplementedError("Implement evaluate_with_trulens")
 
 
@@ -338,62 +338,62 @@ def evaluate_with_trulens(rag_pipeline, golden_dataset: list[dict]) -> dict:
 # A/B Comparison
 # =============================================================================
 
-# def compare_configs(rag_pipeline, golden_dataset: list[dict]):
-#     """
-#     So sánh A/B giữa ít nhất 2 configs.
+def compare_configs(rag_pipeline, golden_dataset: list[dict]):
+    """
+    So sánh A/B giữa ít nhất 2 configs.
 
-#     Gợi ý configs để so sánh:
-#     - Config A: hybrid search + reranking
-#     - Config B: dense-only (không reranking)
-#     - Config C: hybrid search + PageIndex fallback
-#     """
-#     configs = get_ab_configs()
-#     config_a = configs["config_a"]
-#     config_b = configs["config_b"]
+    Gợi ý configs để so sánh:
+    - Config A: hybrid search + reranking
+    - Config B: dense-only (không reranking)
+    - Config C: hybrid search + PageIndex fallback
+    """
+    configs = get_ab_configs()
+    config_a = configs["config_a"]
+    config_b = configs["config_b"]
 
-#     result_a = evaluate_with_ragas(rag_pipeline, golden_dataset, config=config_a)
-#     result_b = evaluate_with_ragas(rag_pipeline, golden_dataset, config=config_b)
+    result_a = evaluate_with_ragas(rag_pipeline, golden_dataset, config=config_a)
+    result_b = evaluate_with_ragas(rag_pipeline, golden_dataset, config=config_b)
 
-#     metric_names = ("faithfulness", "answer_relevancy", "context_recall", "context_precision")
-#     deltas: dict[str, float] = {}
-#     for metric in metric_names:
-#         a_score = float(result_a.get("scores", {}).get(metric, 0.0))
-#         b_score = float(result_b.get("scores", {}).get(metric, 0.0))
-#         deltas[metric] = a_score - b_score
+    metric_names = ("faithfulness", "answer_relevancy", "context_recall", "context_precision")
+    deltas: dict[str, float] = {}
+    for metric in metric_names:
+        a_score = float(result_a.get("scores", {}).get(metric, 0.0))
+        b_score = float(result_b.get("scores", {}).get(metric, 0.0))
+        deltas[metric] = a_score - b_score
 
-#     avg_a = float(result_a.get("scores", {}).get("average", 0.0))
-#     avg_b = float(result_b.get("scores", {}).get("average", 0.0))
-#     delta_average = avg_a - avg_b
+    avg_a = float(result_a.get("scores", {}).get("average", 0.0))
+    avg_b = float(result_b.get("scores", {}).get("average", 0.0))
+    delta_average = avg_a - avg_b
 
-#     if delta_average > 0:
-#         winner = config_a["name"]
-#     elif delta_average < 0:
-#         winner = config_b["name"]
-#     else:
-#         winner = "tie"
+    if delta_average > 0:
+        winner = config_a["name"]
+    elif delta_average < 0:
+        winner = config_b["name"]
+    else:
+        winner = "tie"
 
-#     return {
-#         "framework": "ragas",
-#         "config_a": {
-#             "params": config_a,
-#             "scores": result_a.get("scores", {}),
-#             "num_samples": result_a.get("num_samples", len(golden_dataset)),
-#         },
-#         "config_b": {
-#             "params": config_b,
-#             "scores": result_b.get("scores", {}),
-#             "num_samples": result_b.get("num_samples", len(golden_dataset)),
-#         },
-#         "delta": {
-#             **deltas,
-#             "average": delta_average,
-#         },
-#         "winner": winner,
-#         "raw_results": {
-#             config_a["name"]: result_a,
-#             config_b["name"]: result_b,
-#         },
-#     }
+    return {
+        "framework": "ragas",
+        "config_a": {
+            "params": config_a,
+            "scores": result_a.get("scores", {}),
+            "num_samples": result_a.get("num_samples", len(golden_dataset)),
+        },
+        "config_b": {
+            "params": config_b,
+            "scores": result_b.get("scores", {}),
+            "num_samples": result_b.get("num_samples", len(golden_dataset)),
+        },
+        "delta": {
+            **deltas,
+            "average": delta_average,
+        },
+        "winner": winner,
+        "raw_results": {
+            config_a["name"]: result_a,
+            config_b["name"]: result_b,
+        },
+    }
 
 
 # =============================================================================
